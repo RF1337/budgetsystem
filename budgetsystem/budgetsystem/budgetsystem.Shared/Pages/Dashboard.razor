@@ -1,14 +1,66 @@
 ﻿@page "/"
+@using budgetsystem.Shared.Data.Models
 @using budgetsystem.Shared.Services
-@inject IFormFactor FormFactor
+@inject BudgetService BudgetService
+@inject TransactionService TransactionService
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app running on <em>@factor</em> using <em>@platform</em>.
+<PageTitle>Dashboard</PageTitle>
+
+<div style="height: 100vh; padding: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+
+    <!-- 2x2 grid that expands evenly -->
+    <div style="flex: 2; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+        <!-- Income -->
+        <div style="background: linear-gradient(315deg, #57F874, #2CB851); color: white; padding: 1.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="font-weight: bold; font-size: 1.2rem;">Income</div>
+            <div style="font-size: 1.5rem;">@totalIncome.ToString("C")</div>
+        </div>
+
+
+        <!-- Expense -->
+        <div style="background: linear-gradient(315deg, #FF5959, #C95A5A); color: white; padding: 1.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="font-weight: bold; font-size: 1.2rem;">Expenses</div>
+            <div style="font-size: 1.5rem;">@totalExpenses.ToString("C")</div>
+        </div>
+
+        <!-- Budget -->
+        <div style="background: linear-gradient(315deg, #FFE259, #FFA751); color: white; padding: 1.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="font-weight: bold; font-size: 1.2rem;">@selectedBudget?.Category?.Name</div>
+            <div style="font-size: 1.5rem;">@selectedBudget?.Amount.ToString("C")</div>
+        </div>
+
+
+        <!-- Balance -->
+        <div style="background: linear-gradient(315deg, #738BEA, #414E84); color: white; padding: 1.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="font-weight: bold; font-size: 1.2rem;">Balance</div>
+            <div style="font-size: 1.5rem;">@balance.ToString("C")</div>
+        </div>
+
+    </div>
+
+    <!-- Bottom full-width div fills remaining space -->
+    <div style="flex: 1; background: linear-gradient(315deg, #E5E5E5, #BEBEBE); color: black; padding: 1.5rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+        Full-width summary or overview section
+    </div>
+
+</div>
 
 @code {
-    private string factor => FormFactor.GetFormFactor();
-    private string platform => FormFactor.GetPlatform();
+    private Budget? selectedBudget;
+    private decimal totalExpenses;
+    private decimal totalIncome;
+    private decimal balance;
+
+    protected override async Task OnInitializedAsync()
+    {
+        selectedBudget = await BudgetService.GetFirstAsync();
+        totalExpenses = await TransactionService.GetTotalExpensesAsync();
+        totalIncome = await TransactionService.GetTotalIncomeAsync();
+
+        balance = totalIncome - totalExpenses;
+    }
+
+
 }
