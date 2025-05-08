@@ -1,5 +1,111 @@
-﻿<h3>Transactions</h3>
+﻿@page "/transactions"
+@using budgetsystem.Shared.Services
+@using budgetsystem.Shared.Data.Models
+@using Microsoft.EntityFrameworkCore
+@inject budgetsystem.Shared.Data.MyDbContext Db
+@inject TransactionService TransactionService
+@inject CategoryService CategoryService
+
+<PageTitle>Transactions</PageTitle>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h3>Transactions</h3>
+    <button @onclick="ShowCreateForm"
+            style="background-color: #006444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px;">
+        Create
+    </button>
+</div>
+
+@if (showForm)
+{
+    <div style="margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 1rem;">
+        <input @bind="newTransaction.Description" placeholder="Description" class="form-control" style="width: 200px;" />
+        <input @bind="newTransaction.Amount" type="number" placeholder="Amount" step="0.01" class="form-control" style="width: 120px;" />
+        <input @bind="newTransaction.Type" placeholder="Type (income/expense)" class="form-control" style="width: 150px;" />
+        <select @bind="newTransaction.CategoryId" class="form-select" style="width: 180px;">
+            <option disabled value="">-- Select category --</option>
+            @foreach (var category in categories)
+            {
+                <option value="@category.CategoryID">@category.Name</option>
+            }
+        </select>
+        <button @onclick="CreateTransaction"
+                style="background-color: #006444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px;">
+            Save
+        </button>
+        <button @onclick="CancelForm"
+                style="padding: 0.5rem 1rem; border: 1px solid gray; background-color: white;">
+            Cancel
+        </button>
+    </div>
+}
+
+@if (transactions == null)
+{
+    <p>Loading...</p>
+}
+else if (!transactions.Any())
+{
+    <p>No transactions found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in transactions)
+            {
+                <tr>
+                    <td>@t.Description</td>
+                    <td>@t.Amount.ToString("C")</td>
+                    <td>@t.TransactionDate.ToShortDateString()</td>
+                    <td>@t.Type</td>
+                    <td>@t.Category?.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
+    private List<Transaction> transactions = new();
+    private List<Category> categories = new();
+    private Transaction newTransaction = new();
+    private bool showForm = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await CategoryService.GetAllAsync();
+        transactions = await TransactionService.GetAllAsync();
+    }
+
+    private void ShowCreateForm()
+    {
+        newTransaction = new Transaction
+            {
+                TransactionDate = DateTime.Now,
+                UserID = 1
+            };
+        showForm = true;
+    }
+
+    private void CancelForm()
+    {
+        showForm = false;
+    }
+
+    private async Task CreateTransaction()
+    {
+        await TransactionService.AddAsync(newTransaction);
+        showForm = false;
+        transactions = await TransactionService.GetAllAsync();
+    }
 }

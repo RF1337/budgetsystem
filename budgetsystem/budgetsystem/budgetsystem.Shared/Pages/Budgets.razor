@@ -1,5 +1,103 @@
-﻿<h3>Budgets</h3>
+﻿@page "/budgets"
+@using budgetsystem.Shared.Services
+@using budgetsystem.Shared.Data.Models
+@inject BudgetService BudgetService
+@inject CategoryService CategoryService
+
+<PageTitle>Budgets</PageTitle>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h3>Budgets</h3>
+    <button @onclick="ShowCreateForm"
+            style="background-color: #006444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px;">
+        Create
+    </button>
+</div>
+
+@if (showForm)
+{
+    <div style="margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 1rem;">
+        <input @bind="newBudget.Amount" type="number" placeholder="Amount" step="0.01" class="form-control" style="width: 120px;" />
+        <select @bind="newBudget.CategoryId" class="form-select" style="width: 180px;">
+            <option disabled value="">-- Select category --</option>
+            @foreach (var category in categories)
+            {
+                <option value="@category.CategoryID">@category.Name</option>
+            }
+        </select>
+        <button @onclick="CreateBudget"
+                style="background-color: #006444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px;">
+            Save
+        </button>
+        <button @onclick="CancelForm"
+                style="padding: 0.5rem 1rem; border: 1px solid gray; background-color: white;">
+            Cancel
+        </button>
+    </div>
+}
+
+@if (budgets == null)
+{
+    <p>Loading...</p>
+}
+else if (!budgets.Any())
+{
+    <p>No budgets found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Date Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in budgets)
+            {
+                <tr>
+                    <td>@b.Amount.ToString("C")</td>
+                    <td>@b.Category?.Name</td>
+                    <td>@b.DateCreated.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
+    private List<Budget> budgets = new();
+    private List<Category> categories = new();
+    private Budget newBudget = new();
+    private bool showForm = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await CategoryService.GetAllAsync();
+        budgets = await BudgetService.GetAllAsync();
+    }
+
+    private void ShowCreateForm()
+    {
+        newBudget = new Budget
+            {
+                DateCreated = DateTime.Now,
+                UserID = 1 // ✅ use valid existing user
+            };
+        showForm = true;
+    }
+
+    private void CancelForm()
+    {
+        showForm = false;
+    }
+
+    private async Task CreateBudget()
+    {
+        await BudgetService.AddAsync(newBudget);
+        showForm = false;
+        budgets = await BudgetService.GetAllAsync();
+    }
 }
