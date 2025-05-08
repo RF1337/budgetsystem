@@ -1,28 +1,40 @@
+using Microsoft.EntityFrameworkCore;
+using budgetsystem.Shared.Data;
 using budgetsystem.Shared.Services;
 using budgetsystem.Web.Components;
 using budgetsystem.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// EF Core connection string (manual DB only)
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<MyDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+builder.Services.AddHttpContextAccessor(); // Optional if needed
+
+// No Identity: no .AddIdentity(), no cookie configuration
+
+builder.Services.AddScoped<TransactionService>();
+builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<BudgetService>();
+builder.Services.AddScoped<AppUserService>();
+
+// Razor Components
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Add device-specific services used by the budgetsystem.Shared project
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 

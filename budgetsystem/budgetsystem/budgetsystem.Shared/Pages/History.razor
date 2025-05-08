@@ -1,5 +1,54 @@
-﻿<h3>History</h3>
+﻿@page "/history"
+@using budgetsystem.Shared.Services
+@using budgetsystem.Shared.Data.Models
+@using Microsoft.EntityFrameworkCore
+@inject budgetsystem.Shared.Data.MyDbContext Db
+@inject TransactionService TransactionService
+
+<PageTitle>Transactions</PageTitle>
+
+<h3 class="mb-3">History</h3>
+
+@if (transactions == null)
+{
+    <p>Loading...</p>
+}
+else if (!transactions.Any())
+{
+    <p>No transactions found.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in transactions)
+            {
+                <tr>
+                    <td>@t.Description</td>
+                    <td>@t.Amount.ToString("C")</td>
+                    <td>@t.TransactionDate.ToShortDateString()</td>
+                    <td>@t.Type</td>
+                    <td>@t.Category?.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 @code {
+    private List<Transaction> transactions;
 
+    protected override async Task OnInitializedAsync()
+    {
+        transactions = await TransactionService.GetAllAsync();
+    }
 }
