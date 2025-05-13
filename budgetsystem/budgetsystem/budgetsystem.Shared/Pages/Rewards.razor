@@ -4,7 +4,57 @@
 
 <PageTitle>Rewards</PageTitle>
 
-<h1>Rewards!</h1>
+<table style="width: 100%; border-spacing: 0 0.5rem; font-family: sans-serif;">
+    <thead>
+        <tr style="text-align: left; font-weight: bold;">
+            <th style="padding: 0.5rem 1rem;">POSITION</th>
+            <th style="padding: 0.5rem 1rem;">USER</th>
+            <th style="padding: 0.5rem 1rem;">POINTS</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in leaderboard)
+        {
+            var position = leaderboard.IndexOf(user) + 1;
+            var bgColor = position switch
+            {
+                1 => "background-color: #FFD700;",     // Gold
+                2 => "background-color: #C0C0C0;",     // Silver
+                3 => "background-color: #CD7F32;",     // Bronze
+                _ => "background-color: #00875A;"      // Green
+            };
+
+            var textColor = position <= 3 ? "black" : "white";
+
+            <tr style="@bgColor color: @textColor; border-radius: 1rem; overflow: hidden;">
+                <td style="padding: 0.75rem 1rem; font-weight: bold;">
+                      <span>@position</span>
+                </td>
+                <td style="padding: 0.75rem 1rem;">@user.Username</td>
+                <td style="padding: 0.75rem 1rem;">@user.Score</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+    private List<LeaderboardEntry> leaderboard = new()
+    {
+        new() { Username = "rasmusferst", Score = 999 },
+        new() { Username = "rasmusferst", Score = 888 },
+        new() { Username = "rasmusferst", Score = 777 },
+        new() { Username = "rasmusferst", Score = 666 },
+        new() { Username = "rasmusferst", Score = 555 },
+        new() { Username = "rasmusferst", Score = 444 },
+        new() { Username = "rasmusferst", Score = 333 },
+        new() { Username = "rasmusferst", Score = 222 },
+        new() { Username = "rasmusferst", Score = 111 },
+        new() { Username = "rasmusferst", Score = 100 }
+    };
+
+    private class LeaderboardEntry
+    {
+        public string Username { get; set; } = string.Empty;
+        public int Score { get; set; }
+    }
 }
