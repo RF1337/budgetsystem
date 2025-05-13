@@ -29,7 +29,7 @@ namespace budgetsystem.Shared.Services
         public async Task<decimal> GetTotalExpensesAsync()
         {
             return await _db.Transactions
-                .Where(t => t.Type == "expense")
+                .Where(t => t.Type == "Expense")
                 .SumAsync(t => t.Amount);
         }
 
@@ -37,7 +37,7 @@ namespace budgetsystem.Shared.Services
         public async Task<decimal> GetTotalIncomeAsync()
         {
             return await _db.Transactions
-                .Where(t => t.Type == "income")
+                .Where(t => t.Type == "Income")
                 .SumAsync(t => t.Amount);
         }
 
