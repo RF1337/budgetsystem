@@ -20,6 +20,7 @@ namespace budgetsystem.Shared.Services
                 .FirstOrDefaultAsync();
         }
 
+        // Read Budgets
         public async Task<List<Budget>> GetAllAsync()
         {
             return await _db.Budgets
@@ -27,10 +28,39 @@ namespace budgetsystem.Shared.Services
                 .ToListAsync();
         }
 
+        // Create Budget
         public async Task AddAsync(Budget budget)
         {
             _db.Budgets.Add(budget);
             await _db.SaveChangesAsync();
         }
+
+        // Update Budget
+        public async Task UpdateAsync(Budget budget)
+        {
+            var existing = await _db.Budgets.FindAsync(budget.BudgetID);
+
+            if (existing is not null)
+            {
+                existing.Amount = budget.Amount;
+                existing.CategoryId = budget.CategoryId;
+                existing.DateCreated = budget.DateCreated;
+                existing.UserID = budget.UserID;
+
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        // Delete Budget
+        public async Task DeleteAsync(int budgetId)
+        {
+            var budget = await _db.Budgets.FindAsync(budgetId);
+            if (budget is not null)
+            {
+                _db.Budgets.Remove(budget);
+                await _db.SaveChangesAsync();
+            }
+        }
+
     }
 }
