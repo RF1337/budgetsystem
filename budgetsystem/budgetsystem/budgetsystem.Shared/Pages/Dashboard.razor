@@ -54,12 +54,16 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await RefreshDashboard();
+    }
+
+    public async Task RefreshDashboard()
+    {
         selectedBudget = await BudgetService.GetFirstAsync();
         totalExpenses = await TransactionService.GetTotalExpensesAsync();
         totalIncome = await TransactionService.GetTotalIncomeAsync();
-
         balance = totalIncome - totalExpenses;
+
+        StateHasChanged(); // Sikrer at UI opdateres
     }
-
-
 }
