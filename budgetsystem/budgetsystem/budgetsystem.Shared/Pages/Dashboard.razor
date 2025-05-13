@@ -8,36 +8,35 @@
 
 <PageTitle>Dashboard</PageTitle>
 
-<div style="height: 100vh; padding: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+<div style="height: 100vh; padding: 50px; display: flex; flex-direction: column; row-gap: 30px;">
 
     <!-- 2x2 grid that expands evenly -->
-    <div style="flex: 2; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+    <div style="flex: 2; display: grid; grid-template-columns: repeat(2, 1fr); row-gap: 30px; column-gap: 100px">
         <!-- Income -->
-        <div style="background: linear-gradient(315deg, #57F874, #2CB851); color: white; padding: 1.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <div style="font-weight: bold; font-size: 1.2rem;">Income</div>
-            <div style="font-size: 1.5rem;">@totalIncome.ToString("C")</div>
+        <div style="background: linear-gradient(315deg, #57F874, #2CB851); color: white; padding-left: 4rem; border-radius: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center;">
+            <div style="font-weight: 500; font-size: 21px;">Income</div>
+            <div style="font-size: 21px; margin-top: 0.1rem;">@totalIncome.ToString("C")</div>
         </div>
 
-
         <!-- Expense -->
-        <div style="background: linear-gradient(315deg, #FF5959, #C95A5A); color: white; padding: 1.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <div style="font-weight: bold; font-size: 1.2rem;">Expenses</div>
-            <div style="font-size: 1.5rem;">@totalExpenses.ToString("C")</div>
+        <div style="background: linear-gradient(315deg, #FF5959, #C95A5A); color: white; padding-left: 4rem; border-radius: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center;">
+            <div style="font-weight: 500; font-size: 21px;">Expenses</div>
+            <div style="font-size: 21px; margin-top: 0.1rem;">@totalExpenses.ToString("C")</div>
         </div>
 
         <!-- Budget -->
-        <div style="background: linear-gradient(315deg, #FFE259, #FFA751); color: white; padding: 1.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <div style="font-weight: bold; font-size: 1.2rem;">@selectedBudget?.Category?.Name</div>
-            <div style="font-size: 1.5rem;">@selectedBudget?.Amount.ToString("C")</div>
+        <div style="background: linear-gradient(315deg, #00C9A7, #007D65); color: white; padding-left: 4rem; border-radius: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center;">
+            <div style="font-weight: 500; font-size: 21px;">Budgets</div>
+            <div style="font-size: 16px; font-weight: 100; opacity: 0.8;">@selectedBudget?.Category?.Name</div>
+            <div style="font-size: 21px; margin-top: 0.1rem;">@selectedBudget?.Amount.ToString("C")</div>
         </div>
-
 
         <!-- Balance -->
-        <div style="background: linear-gradient(315deg, #738BEA, #414E84); color: white; padding: 1.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-            <div style="font-weight: bold; font-size: 1.2rem;">Balance</div>
-            <div style="font-size: 1.5rem;">@balance.ToString("C")</div>
+        <div style="background: linear-gradient(315deg, #738BEA, #414E84); color: white; padding-left: 4rem; border-radius: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center;">
+            <div style="font-weight:500; font-size: 21px;">Balance</div>
+            <div style="font-size: 16px; font-weight: 100; opacity: 0.8;">Total</div>
+            <div style="font-size: 21px; margin-top: 0.1rem;">@balance.ToString("C")</div>
         </div>
-
     </div>
 
     <!-- Bottom full-width div fills remaining space -->
