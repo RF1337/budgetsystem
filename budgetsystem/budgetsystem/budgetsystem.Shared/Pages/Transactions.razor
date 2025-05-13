@@ -21,9 +21,13 @@
     <div style="margin-bottom: 2rem; display: flex; flex-wrap: wrap; gap: 1rem;">
         <input @bind="newTransaction.Description" placeholder="Description" class="form-control" style="width: 200px;" />
         <input @bind="newTransaction.Amount" type="number" placeholder="Amount" step="0.01" class="form-control" style="width: 120px;" />
-        <input @bind="newTransaction.Type" placeholder="Type (income/expense)" class="form-control" style="width: 150px;" />
-        <select @bind="newTransaction.CategoryId" class="form-select" style="width: 180px;">
-            <option disabled value="">-- Select category --</option>
+        <select @bind="newTransaction.Type" placeholder="Type" class="form-select" style="width: 150px;">
+            <option disabled value="">Select type</option>
+            <option value="Income">Income</option>
+            <option value="Expense">Expense</option>
+        </select>
+        <select @bind="newTransaction.CategoryId" placeholder="Category" class="form-select" style="width: 180px;">
+            <option disabled value="">Select category</option>
             @foreach (var category in categories)
             {
                 <option value="@category.CategoryID">@category.Name</option>
@@ -50,25 +54,30 @@ else if (!transactions.Any())
 }
 else
 {
-    <table class="table table-striped">
-        <thead>
+    <table class="table">
+        <thead style="background: #EEF3F9; border: 1px solid #BEBEBE;">
             <tr>
                 <th>Description</th>
                 <th>Amount</th>
                 <th>Date</th>
                 <th>Type</th>
                 <th>Category</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var t in transactions)
             {
-                <tr>
+                <tr style="border: 1px solid #BEBEBE; font-weight:300; color: #717171;">
                     <td>@t.Description</td>
                     <td>@t.Amount.ToString("C")</td>
                     <td>@t.TransactionDate.ToShortDateString()</td>
                     <td>@t.Type</td>
                     <td>@t.Category?.Name</td>
+                    <td>
+                        <button @onclick="@(() => EditTransaction(t))" style="background: #007BFF; color: white; border: none; border-radius: 0.3rem; padding: 0.25rem 0.6rem; margin-right: 0.5rem;">Edit</button>
+                        <button @onclick="@(() => DeleteTransaction(t))" style="background: #DC3545; color: white; border: none; border-radius: 0.3rem; padding: 0.25rem 0.6rem;">Delete</button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -80,6 +89,7 @@ else
     private List<Category> categories = new();
     private Transaction newTransaction = new();
     private bool showForm = false;
+    private bool isEditing = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,18 +104,54 @@ else
                 TransactionDate = DateTime.Now,
                 UserID = 1
             };
+        isEditing = false;
         showForm = true;
     }
 
     private void CancelForm()
     {
         showForm = false;
+        isEditing = false;
     }
 
     private async Task CreateTransaction()
     {
-        await TransactionService.AddAsync(newTransaction);
+        if (isEditing)
+        {
+            await TransactionService.UpdateAsync(newTransaction);
+        }
+        else
+        {
+            await TransactionService.AddAsync(newTransaction);
+        }
+
         showForm = false;
+        isEditing = false;
         transactions = await TransactionService.GetAllAsync();
     }
+
+    private void EditTransaction(Transaction t)
+    {
+        // Clone transaction to avoid mutating the list directly
+        newTransaction = new Transaction
+            {
+                TransactionID = t.TransactionID,
+                Description = t.Description,
+                Amount = t.Amount,
+                CategoryId = t.CategoryId,
+                Type = t.Type,
+                TransactionDate = t.TransactionDate,
+                UserID = t.UserID
+            };
+
+        isEditing = true;
+        showForm = true;
+    }
+
+    private async Task DeleteTransaction(Transaction t)
+    {
+        await TransactionService.DeleteAsync(t.TransactionID);
+        transactions = await TransactionService.GetAllAsync();
+    }
+
 }
