@@ -19,8 +19,8 @@ else if (!transactions.Any())
 }
 else
 {
-    <table class="table table-striped">
-        <thead>
+    <table class="table">
+        <thead style="background: #EEF3F9; border: 1px solid #BEBEBE;">
             <tr>
                 <th>Description</th>
                 <th>Amount</th>
@@ -32,7 +32,7 @@ else
         <tbody>
             @foreach (var t in transactions)
             {
-                <tr>
+                <tr style="border: 1px solid #BEBEBE; font-weight:300; color: #717171;">
                     <td>@t.Description</td>
                     <td>@t.Amount.ToString("C")</td>
                     <td>@t.TransactionDate.ToShortDateString()</td>

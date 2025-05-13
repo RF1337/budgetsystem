@@ -25,9 +25,9 @@
                 <option value="@category.CategoryID">@category.Name</option>
             }
         </select>
-        <button @onclick="CreateBudget"
+        <button @onclick="CreateOrUpdateBudget"
                 style="background-color: #006444; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px;">
-            Save
+            @((isEditing ? "Update" : "Save"))
         </button>
         <button @onclick="CancelForm"
                 style="padding: 0.5rem 1rem; border: 1px solid gray; background-color: white;">
@@ -46,21 +46,32 @@ else if (!budgets.Any())
 }
 else
 {
-    <table class="table table-striped">
-        <thead>
+    <table class="table">
+        <thead style="background: #EEF3F9; border: 1px solid #BEBEBE;">
             <tr>
                 <th>Amount</th>
                 <th>Category</th>
                 <th>Date Created</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var b in budgets)
             {
-                <tr>
+                <tr style="border: 1px solid #BEBEBE; font-weight:300; color: #717171;">
                     <td>@b.Amount.ToString("C")</td>
                     <td>@b.Category?.Name</td>
                     <td>@b.DateCreated.ToShortDateString()</td>
+                    <td>
+                        <button @onclick="@(() => EditBudget(b))"
+                                style="background: #007BFF; color: white; border: none; border-radius: 0.3rem; padding: 0.25rem 0.6rem; margin-right: 0.5rem;">
+                            Edit
+                        </button>
+                        <button @onclick="@(() => DeleteBudget(b))"
+                                style="background: #DC3545; color: white; border: none; border-radius: 0.3rem; padding: 0.25rem 0.6rem;">
+                            Delete
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -72,6 +83,7 @@ else
     private List<Category> categories = new();
     private Budget newBudget = new();
     private bool showForm = false;
+    private bool isEditing = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,20 +96,51 @@ else
         newBudget = new Budget
             {
                 DateCreated = DateTime.Now,
-                UserID = 1 // ✅ use valid existing user
+                UserID = 1
             };
+        isEditing = false;
         showForm = true;
     }
 
     private void CancelForm()
     {
         showForm = false;
+        isEditing = false;
     }
 
-    private async Task CreateBudget()
+    private async Task CreateOrUpdateBudget()
     {
-        await BudgetService.AddAsync(newBudget);
+        if (isEditing)
+        {
+            await BudgetService.UpdateAsync(newBudget);
+        }
+        else
+        {
+            await BudgetService.AddAsync(newBudget);
+        }
+
         showForm = false;
+        isEditing = false;
+        budgets = await BudgetService.GetAllAsync();
+    }
+
+    private void EditBudget(Budget b)
+    {
+        newBudget = new Budget
+            {
+                BudgetID = b.BudgetID,
+                Amount = b.Amount,
+                CategoryId = b.CategoryId,
+                UserID = b.UserID,
+                DateCreated = b.DateCreated
+            };
+        isEditing = true;
+        showForm = true;
+    }
+
+    private async Task DeleteBudget(Budget b)
+    {
+        await BudgetService.DeleteAsync(b.BudgetID);
         budgets = await BudgetService.GetAllAsync();
     }
 }
