@@ -12,7 +12,7 @@ namespace budgetsystem.Shared.Data
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Budget> Budgets { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<AppUser> AppUsers { get; set; } // 👈 Du manglede denne!
+        public DbSet<AppUser> AppUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

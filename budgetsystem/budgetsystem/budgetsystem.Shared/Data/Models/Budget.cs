@@ -8,12 +8,13 @@ namespace budgetsystem.Shared.Data.Models
 {
     public class Budget
     {
+        public int BudgetID { get; set; }
         public int UserID { get; set; }
-        public int CategoryId { get; set; }  
-        public DateTime DateCreated { get; set; } = DateTime.Now;
-
-        public int BudgetID { get; set; } 
         public decimal Amount { get; set; }
-        public Category Category { get; set; }
+        public int CategoryId { get; set; }
+        public int Month { get; set; }
+        public DateTime DateCreated { get; set; } = DateTime.Now;
+        // Navigation property
+        public Category? Category { get; set; }
     }
 }
