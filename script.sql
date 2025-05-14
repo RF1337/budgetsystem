@@ -1,0 +1,70 @@
+CREATE DATABASE BudgetSystem;
+GO
+
+USE BudgetSystem;
+GO
+
+CREATE TABLE AppUser (
+    UserID INT PRIMARY KEY IDENTITY(1,1),
+    Username NVARCHAR(50) NOT NULL,
+    Email NVARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETDATE()
+);
+
+CREATE TABLE Category (
+    CategoryID INT PRIMARY KEY IDENTITY(1,1),
+    Name NVARCHAR(50) NOT NULL,
+    Description NVARCHAR(255)
+);
+
+CREATE TABLE Budget (
+    BudgetID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL,
+    Amount DECIMAL(10, 2) NOT NULL,
+    CategoryID INT NOT NULL,
+    [Month] INT NOT NULL,
+    DateCreated DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES AppUser(UserID),
+    FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID)
+);
+
+CREATE TABLE [Transaction] (
+    TransactionID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL,
+    CategoryID INT NOT NULL,
+    Amount DECIMAL(10, 2) NOT NULL,
+    TransactionDate DATE NOT NULL,
+    Description NVARCHAR(255),
+    [Type] NVARCHAR(20) CHECK ([Type] IN ('Income', 'Expense')),
+    Created_At DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES AppUser(UserID),
+    FOREIGN KEY (CategoryID) REFERENCES Category(CategoryID)
+);
+
+CREATE TABLE Log (
+    LogID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL,
+    Description NVARCHAR(255) NOT NULL,
+    DateCreated DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES AppUser(UserID)
+);
+
+CREATE TABLE Leaderboard (
+    LeaderboardID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL,
+    Score INT NOT NULL DEFAULT 0,
+    Rank INT NOT NULL,
+    DateCreated DATETIME NOT NULL DEFAULT GETDATE(),
+    DateUpdated DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES AppUser(UserID)
+);
+
+CREATE TABLE Reward (
+    RewardID INT PRIMARY KEY IDENTITY(1,1),
+    LeaderboardID INT NOT NULL,
+    RewardName NVARCHAR(100) NOT NULL,
+    RequiredRank INT NOT NULL,
+    DateCreated DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (LeaderboardID) REFERENCES Leaderboard(LeaderboardID)
+);
